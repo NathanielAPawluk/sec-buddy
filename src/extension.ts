@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
 		if(response === 'Plans'){
 			vscode.env.openExternal(vscode.Uri.parse('https://docs.google.com/document/d/1ajQbIBILqC7eJM0Bc9Ylj9J7tyNvx90QQ41-XbVyMLs/edit?usp=sharing'));	
 		} else if(response === 'GitHub Page'){
-			vscode.env.openExternal(vscode.Uri.parse('https://github.com/PrincessCuddles/sec-buddy')); 
+			vscode.env.openExternal(vscode.Uri.parse('https://github.com/NathanielAPawluk/sec-buddy')); 
 		}
 
 	}));
