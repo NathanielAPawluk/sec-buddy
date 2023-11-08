@@ -12,3 +12,5 @@ I will be periodically updated this program for the remainder of the year (2023)
 -JavaScript
 
 -Potentially more, if I have time
+
+The current implementation of this plugin utilizes a built-in language server, which may end up getting ported over to other IDE's in the future (this project has been made for Visual Studio Code). This is being built upon the lsp-sample provided by Visual Studio.
