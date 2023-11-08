@@ -1,0 +1,19 @@
+{
+	"name": "sec-buddy",
+	"description": "Client side of the extension",
+	"version": "0.1.1",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/NathanielAPawluk/sec-buddy"
+	},
+	"engines": {
+		"vscode": "^1.75.0"
+	},
+	"dependencies": {
+		"vscode-languageclient": "^8.1.0"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.75.1",
+		"@vscode/test-electron": "^2.2.3"
+	}
+}
