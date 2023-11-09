@@ -28,7 +28,12 @@
 			  "command": "sec-buddy.progress",
 			  "category": "Sec Buddy",
 			  "title": "Progress"
-			}
+			},
+			{
+				"command": "sec-buddy.bug",
+				"category": "Sec Buddy",
+				"title": "Report a Bug"
+			  }
 		  ],
 		"configuration": {
 			"type": "object",
