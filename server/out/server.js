@@ -98,11 +98,11 @@ async function validateTextDocument(textDocument) {
     const settings = await getDocumentSettings(textDocument.uri);
     // The validator creates diagnostics for strcpy()
     const text = textDocument.getText();
-    const pattern = /strcpy\(*.+?\)/g;
+    const strcpypattern = /strcpy\(*.+?\)/g;
     let m;
     let problems = 0;
     const diagnostics = [];
-    while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+    while ((m = strcpypattern.exec(text)) && problems < settings.maxNumberOfProblems) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -110,28 +110,105 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: `${m[0]} is depricated. Consider using strncpy()`,
+            message: `${m[0]} is vulnerable. Consider using strncpy()`,
             source: 'sec-buddy'
         };
-        /* This sends extra diagnostic information that is currently not needed
-        if (hasDiagnosticRelatedInformationCapability) {
-            diagnostic.relatedInformation = [
-                {
-                    location: {
-                        uri: textDocument.uri,
-                        range: Object.assign({}, diagnostic.range)
-                    },
-                    message: 'Spelling matters'
-                },
-                {
-                    location: {
-                        uri: textDocument.uri,
-                        range: Object.assign({}, diagnostic.range)
-                    },
-                    message: 'Particularly for names'
-                }
-            ];
-        }*/
+        diagnostics.push(diagnostic);
+    }
+    // The validator creates diagnostics for gets()
+    const getspattern = /gets\(*.+?\)/g;
+
+    while ((m = getspattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+        problems++;
+        const diagnostic = {
+            severity: node_1.DiagnosticSeverity.Warning,
+            range: {
+                start: textDocument.positionAt(m.index),
+                end: textDocument.positionAt(m.index + m[0].length)
+            },
+            message: `${m[0]} is vulnerable. Consider using fgets()`,
+            source: 'sec-buddy'
+        };
+        diagnostics.push(diagnostic);
+    }
+    // The validator creates diagnostics for stpcpy()
+    const stpcpypattern = /stpcpy\(*.+?\)/g;
+
+    while ((m = stpcpypattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+        problems++;
+        const diagnostic = {
+            severity: node_1.DiagnosticSeverity.Warning,
+            range: {
+                start: textDocument.positionAt(m.index),
+                end: textDocument.positionAt(m.index + m[0].length)
+            },
+            message: `${m[0]} is vulnerable. Consider using stpncpy()`,
+            source: 'sec-buddy'
+        };
+        diagnostics.push(diagnostic);
+    }
+    // The validator creates diagnostics for strcat()
+    const strcatpattern = /strcat\(*.+?\)/g;
+
+    while ((m = strcatpattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+        problems++;
+        const diagnostic = {
+            severity: node_1.DiagnosticSeverity.Warning,
+            range: {
+                start: textDocument.positionAt(m.index),
+                end: textDocument.positionAt(m.index + m[0].length)
+            },
+            message: `${m[0]} is vulnerable. Consider using strncat()`,
+            source: 'sec-buddy'
+        };
+        diagnostics.push(diagnostic);
+    }
+    // The validator creates diagnostics for strcmp()
+    const strcmppattern = /strcmp\(*.+?\)/g;
+
+    while ((m = strcmppattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+        problems++;
+        const diagnostic = {
+            severity: node_1.DiagnosticSeverity.Warning,
+            range: {
+                start: textDocument.positionAt(m.index),
+                end: textDocument.positionAt(m.index + m[0].length)
+            },
+            message: `${m[0]} is vulnerable. Consider using strncmp()`,
+            source: 'sec-buddy'
+        };
+        diagnostics.push(diagnostic);
+    }
+    // The validator creates diagnostics for sprintf()
+    const sprintfpattern = /sprintf\(*.+?\)/g;
+
+    while ((m = sprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+        problems++;
+        const diagnostic = {
+            severity: node_1.DiagnosticSeverity.Warning,
+            range: {
+                start: textDocument.positionAt(m.index),
+                end: textDocument.positionAt(m.index + m[0].length)
+            },
+            message: `${m[0]} is vulnerable. Consider using snprintf()`,
+            source: 'sec-buddy'
+        };
+        diagnostics.push(diagnostic);
+    }
+    // The validator creates diagnostics for vsprintf()
+    const vsprintfpattern = /vsprintf\(*.+?\)/g;
+
+    while ((m = vsprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+        problems++;
+        const diagnostic = {
+            severity: node_1.DiagnosticSeverity.Warning,
+            range: {
+                start: textDocument.positionAt(m.index),
+                end: textDocument.positionAt(m.index + m[0].length)
+            },
+            message: `${m[0]} is vulnerable. Consider using snprintf()`,
+            source: 'sec-buddy'
+        };
         diagnostics.push(diagnostic);
     }
     // Send the computed diagnostics to VSCode.
