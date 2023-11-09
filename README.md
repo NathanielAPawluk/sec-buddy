@@ -39,5 +39,6 @@ vsprintf() gets caught with both the sprintf() and vsprintf() vulnerabilites, la
 
 ## Links
 [Gantt Chart outlining my desired timeline](https://docs.google.com/spreadsheets/d/1GuXvdTbiaAUqEo6yg0PqPoB8BL2E7ebxp7SBiiyEnoo/edit?usp=sharing)
+
 [Product Backlog](https://docs.google.com/document/d/1ajQbIBILqC7eJM0Bc9Ylj9J7tyNvx90QQ41-XbVyMLs/edit?usp=sharing)
 
