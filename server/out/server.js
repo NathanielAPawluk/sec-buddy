@@ -96,9 +96,9 @@ documents.onDidChangeContent(change => {
 async function validateTextDocument(textDocument) {
     // In this simple example we get the settings for every validate run.
     const settings = await getDocumentSettings(textDocument.uri);
-    // The validator creates diagnostics for all uppercase words length 2 and more
+    // The validator creates diagnostics for strcpy()
     const text = textDocument.getText();
-    const pattern = /\b[A-Z]{2,}\b/g;
+    const pattern = /strcpy\(*.+?\)/g;
     let m;
     let problems = 0;
     const diagnostics = [];
@@ -110,9 +110,10 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: `${m[0]} is all uppercase.`,
-            source: 'ex'
+            message: `${m[0]} is depricated. Consider using strncpy()`,
+            source: 'sec-buddy'
         };
+        /* This sends extra diagnostic information that is currently not needed
         if (hasDiagnosticRelatedInformationCapability) {
             diagnostic.relatedInformation = [
                 {
@@ -130,7 +131,7 @@ async function validateTextDocument(textDocument) {
                     message: 'Particularly for names'
                 }
             ];
-        }
+        }*/
         diagnostics.push(diagnostic);
     }
     // Send the computed diagnostics to VSCode.
