@@ -55,7 +55,8 @@ connection.onInitialized(() => {
 // The global settings, used when the `workspace/configuration` request is not supported by the client.
 // Please note that this is not the case when using this server with the client provided in this example
 // but could happen with other clients.
-const defaultSettings = { maxNumberOfProblems: 1000 };
+const defaultSettings = { maxNumberOfProblems: 1000,
+    c: { strcpy: true, gets: true, stpcpy: true, strcat: true, strcmp: true, sprintf: true, vsprintf: true } };
 let globalSettings = defaultSettings;
 // Cache the settings of all open documents
 const documentSettings = new Map();
@@ -65,7 +66,7 @@ connection.onDidChangeConfiguration(change => {
         documentSettings.clear();
     }
     else {
-        globalSettings = ((change.settings.secbuddy || defaultSettings));
+        globalSettings = ((change.settings.languageServerExample || defaultSettings));
     }
     // Revalidate all open text documents
     documents.all().forEach(validateTextDocument);
@@ -94,16 +95,16 @@ documents.onDidChangeContent(change => {
     validateTextDocument(change.document);
 });
 async function validateTextDocument(textDocument) {
-    // In this simple example we get the settings for every validate run.
+    // Get the settings for every run
     const settings = await getDocumentSettings(textDocument.uri);
-    // The validator creates diagnostics for strcpy()
+    // Validation Setup
     const text = textDocument.getText();
-    const strcpypattern = /strcpy\(*.+?\)/g;
     let m;
     let problems = 0;
     const diagnostics = [];
-    while ((m = strcpypattern.exec(text)) && problems < settings.maxNumberOfProblems && 
-            settings.c.strcpy == true) {
+    // Check for strcpy()
+    const strcpypattern = /strcpy\(*.+?\)/g;
+    while ((m = strcpypattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.strcpy == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -111,16 +112,14 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: `${m[0]} is vulnerable. Consider using strncpy()`,
+            message: `${m[0]} is vulnerable. Consider using strncpy().`,
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);
     }
-    // The validator creates diagnostics for gets()
+    // Check for gets()
     const getspattern = /gets\(*.+?\)/g;
-
-    while ((m = getspattern.exec(text)) && problems < settings.maxNumberOfProblems && 
-    settings.c.gets == true) {
+    while ((m = getspattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.gets == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -128,16 +127,14 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: `${m[0]} is vulnerable. Consider using fgets()`,
+            message: `${m[0]} is vulnerable. Consider using fgets().`,
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);
     }
-    // The validator creates diagnostics for stpcpy()
+    // Check for stpcpy()
     const stpcpypattern = /stpcpy\(*.+?\)/g;
-
-    while ((m = stpcpypattern.exec(text)) && problems < settings.maxNumberOfProblems && 
-    settings.c.stpcpy == true) {
+    while ((m = stpcpypattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.stpcpy == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -145,16 +142,14 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: `${m[0]} is vulnerable. Consider using stpncpy()`,
+            message: `${m[0]} is vulnerable. Consider using stpncpy().`,
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);
     }
-    // The validator creates diagnostics for strcat()
+    // Check for strcat()
     const strcatpattern = /strcat\(*.+?\)/g;
-
-    while ((m = strcatpattern.exec(text)) && problems < settings.maxNumberOfProblems && 
-    settings.c.strcat == true) {
+    while ((m = strcatpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.strcat == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -162,16 +157,14 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: `${m[0]} is vulnerable. Consider using strncat()`,
+            message: `${m[0]} is vulnerable. Consider using strncat().`,
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);
     }
-    // The validator creates diagnostics for strcmp()
+    // Check for strcmp()
     const strcmppattern = /strcmp\(*.+?\)/g;
-
-    while ((m = strcmppattern.exec(text)) && problems < settings.maxNumberOfProblems && 
-    settings.c.strcmp == true) {
+    while ((m = strcmppattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.strcmp == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -179,16 +172,14 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: `${m[0]} is vulnerable. Consider using strncmp()`,
+            message: `${m[0]} is vulnerable. Consider using strncmp().`,
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);
     }
-    // The validator creates diagnostics for sprintf()
+    // Check for sprintf()
     const sprintfpattern = /sprintf\(*.+?\)/g;
-
-    while ((m = sprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems && 
-    settings.c.sprintf == true) {
+    while ((m = sprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.sprintf == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -196,16 +187,14 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: `${m[0]} is vulnerable. Consider using snprintf()`,
+            message: `${m[0]} is vulnerable. Consider using snprintf().`,
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);
     }
-    // The validator creates diagnostics for vsprintf()
+    // Check for vsprintf()
     const vsprintfpattern = /vsprintf\(*.+?\)/g;
-
-    while ((m = vsprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems && 
-    settings.c.vsprintf == true) {
+    while ((m = vsprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.vsprintf == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -213,7 +202,7 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: `${m[0]} is vulnerable. Consider using snprintf()`,
+            message: `${m[0]} is vulnerable. Consider using snprintf().`,
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);

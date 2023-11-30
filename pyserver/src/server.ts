@@ -80,26 +80,33 @@ connection.onInitialized(() => {
 	}
 });
 
-// The example settings
-interface ExampleSettings {
+//The default settings
+
+interface python {
+	errorMessages: boolean
+	inputValidation: boolean
+}
+
+interface defaultSettings {
 	maxNumberOfProblems: number;
+	python: python
 }
 
 // The global settings, used when the `workspace/configuration` request is not supported by the client.
 // Please note that this is not the case when using this server with the client provided in this example
 // but could happen with other clients.
-const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000 };
-let globalSettings: ExampleSettings = defaultSettings;
+const defaultSettings: defaultSettings = { maxNumberOfProblems: 1000, python: {errorMessages: true, inputValidation: true} };
+let globalSettings: defaultSettings = defaultSettings;
 
 // Cache the settings of all open documents
-const documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
+const documentSettings: Map<string, Thenable<defaultSettings>> = new Map();
 
 connection.onDidChangeConfiguration(change => {
 	if (hasConfigurationCapability) {
 		// Reset all cached document settings
 		documentSettings.clear();
 	} else {
-		globalSettings = <ExampleSettings>(
+		globalSettings = <defaultSettings>(
 			(change.settings.languageServerExample || defaultSettings)
 		);
 	}
@@ -108,7 +115,7 @@ connection.onDidChangeConfiguration(change => {
 	documents.all().forEach(validateTextDocument);
 });
 
-function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
+function getDocumentSettings(resource: string): Thenable<defaultSettings> {
 	if (!hasConfigurationCapability) {
 		return Promise.resolve(globalSettings);
 	}
@@ -116,7 +123,7 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 	if (!result) {
 		result = connection.workspace.getConfiguration({
 			scopeUri: resource,
-			section: 'languageServerExample'
+			section: 'secbuddy'
 		});
 		documentSettings.set(resource, result);
 	}
@@ -138,14 +145,15 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// In this simple example we get the settings for every validate run.
 	const settings = await getDocumentSettings(textDocument.uri);
 
-	// The validator creates diagnostics for all uppercase words length 2 and more
+	// Validation setup
 	const text = textDocument.getText();
-	const pattern = /\b[A-Z]{2,}\b/g;
 	let m: RegExpExecArray | null;
-
 	let problems = 0;
 	const diagnostics: Diagnostic[] = [];
-	while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+
+	// Check for anything containing the word "error"
+	const errorpattern = /error/gi;
+	while ((m = errorpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.python.errorMessages == true) {
 		problems++;
 		const diagnostic: Diagnostic = {
 			severity: DiagnosticSeverity.Warning,
@@ -153,29 +161,51 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 				start: textDocument.positionAt(m.index),
 				end: textDocument.positionAt(m.index + m[0].length)
 			},
-			message: `${m[0]} is all uppercase.`,
-			source: 'ex'
+			message: `Error messages can lead to vulnerabilities if this code is used as part of a client. To turn these messages off, go to the extensions settings and disable "Error Message Checks"`,
+			source: 'sec-buddy'
 		};
-		if (hasDiagnosticRelatedInformationCapability) {
-			diagnostic.relatedInformation = [
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Spelling matters'
-				},
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Particularly for names'
-				}
-			];
-		}
 		diagnostics.push(diagnostic);
 	}
+
+	// Reminder for input validation
+	const inputpattern = /input\(*.+?\)/g;
+	while ((m = inputpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.python.inputValidation == true) {
+		problems++;
+		const diagnostic: Diagnostic = {
+			severity: DiagnosticSeverity.Warning,
+			range: {
+				start: textDocument.positionAt(m.index),
+				end: textDocument.positionAt(m.index + m[0].length)
+			},
+            message: 'Ensure that there is input validation for this! You can turn these reminders off in the extension\'s settings under "Input Validation"',
+			source: 'sec-buddy'
+		};
+		diagnostics.push(diagnostic);
+	}
+
+	// Check for the use of the makefile package
+	const makefilepattern = /makefile/g;
+	let makefileExists = false;
+	while ((m = makefilepattern.exec(text))) {
+		makefileExists = true;
+	}
+
+	// Check for mktemp()
+	const mktemppattern = /mktemp\(*.+?\)/g;
+	while ((m = mktemppattern.exec(text)) && problems < settings.maxNumberOfProblems && makefileExists) {
+		problems++;
+		const diagnostic: Diagnostic = {
+			severity: DiagnosticSeverity.Warning,
+			range: {
+				start: textDocument.positionAt(m.index),
+				end: textDocument.positionAt(m.index + m[0].length)
+			},
+            message: `${m[0]} can overwrite existing temp files, consider using mkstemp() (CVE-2023-2800)`,
+			source: 'sec-buddy'
+		};
+		diagnostics.push(diagnostic);
+	}
+
 
 	// Send the computed diagnostics to VSCode.
 	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });

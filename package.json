@@ -58,43 +58,43 @@
 				"secbuddy.c.strcpy": {
 					"scope": "resource",
 					"type": "boolean",
-					"default": "True",
+					"default": "true",
 					"description": "Show errors for strcpy()"
 				},
 				"secbuddy.c.gets": {
 					"scope": "resource",
 					"type": "boolean",
-					"default": "True",
+					"default": "true",
 					"description": "Show errors for gets()"
 				},
 				"secbuddy.c.stpcpy": {
 					"scope": "resource",
 					"type": "boolean",
-					"default": "True",
+					"default": "true",
 					"description": "Show errors for stpcpy()"
 				},
 				"secbuddy.c.strcat": {
 					"scope": "resource",
 					"type": "boolean",
-					"default": "True",
+					"default": "true",
 					"description": "Show errors for strcat()"
 				},
 				"secbuddy.c.strcmp": {
 					"scope": "resource",
 					"type": "boolean",
-					"default": "True",
+					"default": "true",
 					"description": "Show errors for strcmp()"
 				},
 				"secbuddy.c.sprintf": {
 					"scope": "resource",
 					"type": "boolean",
-					"default": "True",
+					"default": "true",
 					"description": "Show errors for sprintf()"
 				},
 				"secbuddy.c.vsprintf": {
 					"scope": "resource",
 					"type": "boolean",
-					"default": "True",
+					"default": "true",
 					"description": "Show errors for vsprint()"
 				},
 				"secbuddy.python.version": {
@@ -129,13 +129,13 @@
 				"secbuddy.python.errorMessages": {
 					"scope": "resource",
 					"type": "boolean",
-					"default": "True",
+					"default": "true",
 					"description": "Highlights any indication of the word \"error\"."
 				},
 				"secbuddy.python.inputValidation": {
 					"scope": "resource",
 					"type": "boolean",
-					"default": "True",
+					"default": "true",
 					"description": "Highlights any instance of the input() function for input validation."
 				}
 			}

@@ -80,26 +80,39 @@ connection.onInitialized(() => {
 	}
 });
 
-// The example settings
-interface ExampleSettings {
+
+// Server settings setup
+interface c {
+	strcpy: boolean
+	gets: boolean
+	stpcpy: boolean
+	strcat: boolean
+	strcmp: boolean
+	sprintf: boolean
+	vsprintf: boolean
+}
+
+interface serverSettings {
 	maxNumberOfProblems: number;
+	c: c;
 }
 
 // The global settings, used when the `workspace/configuration` request is not supported by the client.
 // Please note that this is not the case when using this server with the client provided in this example
 // but could happen with other clients.
-const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000 };
-let globalSettings: ExampleSettings = defaultSettings;
+const defaultSettings: serverSettings = { maxNumberOfProblems: 1000, 
+	c: {strcpy: true, gets: true, stpcpy: true, strcat: true, strcmp: true, sprintf: true, vsprintf: true} };
+let globalSettings: serverSettings = defaultSettings;
 
 // Cache the settings of all open documents
-const documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
+const documentSettings: Map<string, Thenable<serverSettings>> = new Map();
 
 connection.onDidChangeConfiguration(change => {
 	if (hasConfigurationCapability) {
 		// Reset all cached document settings
 		documentSettings.clear();
 	} else {
-		globalSettings = <ExampleSettings>(
+		globalSettings = <serverSettings>(
 			(change.settings.languageServerExample || defaultSettings)
 		);
 	}
@@ -108,7 +121,7 @@ connection.onDidChangeConfiguration(change => {
 	documents.all().forEach(validateTextDocument);
 });
 
-function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
+function getDocumentSettings(resource: string): Thenable<serverSettings> {
 	if (!hasConfigurationCapability) {
 		return Promise.resolve(globalSettings);
 	}
@@ -116,7 +129,7 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 	if (!result) {
 		result = connection.workspace.getConfiguration({
 			scopeUri: resource,
-			section: 'languageServerExample'
+			section: 'secbuddy'
 		});
 		documentSettings.set(resource, result);
 	}
@@ -135,17 +148,18 @@ documents.onDidChangeContent(change => {
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
-	// In this simple example we get the settings for every validate run.
+	// Get the settings for every run
 	const settings = await getDocumentSettings(textDocument.uri);
 
-	// The validator creates diagnostics for all uppercase words length 2 and more
+	// Validation Setup
 	const text = textDocument.getText();
-	const pattern = /\b[A-Z]{2,}\b/g;
 	let m: RegExpExecArray | null;
-
 	let problems = 0;
 	const diagnostics: Diagnostic[] = [];
-	while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+
+	// Check for strcpy()
+	const strcpypattern = /strcpy\(*.+?\)/g;
+	while ((m = strcpypattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.strcpy == true) {
 		problems++;
 		const diagnostic: Diagnostic = {
 			severity: DiagnosticSeverity.Warning,
@@ -153,27 +167,112 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 				start: textDocument.positionAt(m.index),
 				end: textDocument.positionAt(m.index + m[0].length)
 			},
-			message: `${m[0]} is all uppercase.`,
-			source: 'ex'
+			message: `${m[0]} is vulnerable. Consider using strncpy().`,
+			source: 'sec-buddy'
 		};
-		if (hasDiagnosticRelatedInformationCapability) {
-			diagnostic.relatedInformation = [
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Spelling matters'
-				},
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Particularly for names'
-				}
-			];
-		}
+		
+		diagnostics.push(diagnostic);
+	}
+
+	// Check for gets()
+	const getspattern = /gets\(*.+?\)/g;
+	while ((m = getspattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.gets == true) {
+		problems++;
+		const diagnostic: Diagnostic = {
+			severity: DiagnosticSeverity.Warning,
+			range: {
+				start: textDocument.positionAt(m.index),
+				end: textDocument.positionAt(m.index + m[0].length)
+			},
+			message: `${m[0]} is vulnerable. Consider using fgets().`,
+			source: 'sec-buddy'
+		};
+
+		diagnostics.push(diagnostic);
+	}
+
+	// Check for stpcpy()
+	const stpcpypattern = /stpcpy\(*.+?\)/g;
+	while ((m = stpcpypattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.stpcpy == true) {
+		problems++;
+		const diagnostic: Diagnostic = {
+			severity: DiagnosticSeverity.Warning,
+			range: {
+				start: textDocument.positionAt(m.index),
+				end: textDocument.positionAt(m.index + m[0].length)
+			},
+			message: `${m[0]} is vulnerable. Consider using stpncpy().`,
+			source: 'sec-buddy'
+		};
+
+		diagnostics.push(diagnostic);
+	}
+
+	// Check for strcat()
+	const strcatpattern = /strcat\(*.+?\)/g;
+	while ((m = strcatpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.strcat == true) {
+		problems++;
+		const diagnostic: Diagnostic = {
+			severity: DiagnosticSeverity.Warning,
+			range: {
+				start: textDocument.positionAt(m.index),
+				end: textDocument.positionAt(m.index + m[0].length)
+			},
+			message: `${m[0]} is vulnerable. Consider using strncat().`,
+			source: 'sec-buddy'
+		};
+
+		diagnostics.push(diagnostic);
+	}
+
+	// Check for strcmp()
+	const strcmppattern = /strcmp\(*.+?\)/g;
+	while ((m = strcmppattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.strcmp == true) {
+		problems++;
+		const diagnostic: Diagnostic = {
+			severity: DiagnosticSeverity.Warning,
+			range: {
+				start: textDocument.positionAt(m.index),
+				end: textDocument.positionAt(m.index + m[0].length)
+			},
+			message: `${m[0]} is vulnerable. Consider using strncmp().`,
+			source: 'sec-buddy'
+		};
+
+		diagnostics.push(diagnostic);
+	}
+
+	// Check for sprintf()
+	const sprintfpattern = /sprintf\(*.+?\)/g;
+	while ((m = sprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.sprintf == true) {
+		problems++;
+		const diagnostic: Diagnostic = {
+			severity: DiagnosticSeverity.Warning,
+			range: {
+				start: textDocument.positionAt(m.index),
+				end: textDocument.positionAt(m.index + m[0].length)
+			},
+			message: `${m[0]} is vulnerable. Consider using snprintf().`,
+			source: 'sec-buddy'
+		};
+
+		diagnostics.push(diagnostic);
+	}
+
+	// Check for vsprintf()
+	const vsprintfpattern = /vsprintf\(*.+?\)/g;
+	while ((m = vsprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.vsprintf == true) {
+		problems++;
+		const diagnostic: Diagnostic = {
+			severity: DiagnosticSeverity.Warning,
+			range: {
+				start: textDocument.positionAt(m.index),
+				end: textDocument.positionAt(m.index + m[0].length)
+			},
+			message: `${m[0]} is vulnerable. Consider using snprintf().`,
+			source: 'sec-buddy'
+		};
+
 		diagnostics.push(diagnostic);
 	}
 

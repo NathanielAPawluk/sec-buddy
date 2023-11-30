@@ -55,7 +55,7 @@ connection.onInitialized(() => {
 // The global settings, used when the `workspace/configuration` request is not supported by the client.
 // Please note that this is not the case when using this server with the client provided in this example
 // but could happen with other clients.
-const defaultSettings = { maxNumberOfProblems: 1000 };
+const defaultSettings = { maxNumberOfProblems: 1000, python: { errorMessages: true, inputValidation: true } };
 let globalSettings = defaultSettings;
 // Cache the settings of all open documents
 const documentSettings = new Map();
@@ -65,7 +65,7 @@ connection.onDidChangeConfiguration(change => {
         documentSettings.clear();
     }
     else {
-        globalSettings = ((change.settings.secbuddy || defaultSettings));
+        globalSettings = ((change.settings.languageServerExample || defaultSettings));
     }
     // Revalidate all open text documents
     documents.all().forEach(validateTextDocument);
@@ -96,13 +96,14 @@ documents.onDidChangeContent(change => {
 async function validateTextDocument(textDocument) {
     // In this simple example we get the settings for every validate run.
     const settings = await getDocumentSettings(textDocument.uri);
-    // The validator creates diagnostics for strcpy()
+    // Validation setup
     const text = textDocument.getText();
-    const errorPattern = /error/gi;
     let m;
     let problems = 0;
     const diagnostics = [];
-    while ((m = errorPattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.python.errorMessages == true) {
+    // Check for anything containing the word "error"
+    const errorpattern = /error/gi;
+    while ((m = errorpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.python.errorMessages == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -110,14 +111,14 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: `Error messages can lead to vulnerabilities if this code is used as part of a client. To turn these messages off, go to the extensions settings and disable \"Error Message Checks\"`,
+            message: `Error messages can lead to vulnerabilities if this code is used as part of a client. To turn these messages off, go to the extensions settings and disable "Error Message Checks"`,
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);
     }
-
-    const inputPattern = /input\(*.+?\)/g
-    while ((m = inputPattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.python.inputValidation == true) {
+    // Reminder for input validation
+    const inputpattern = /input\(*.+?\)/g;
+    while ((m = inputpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.python.inputValidation == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -125,20 +126,20 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: 'Ensure that there is input validation for this! You can turn these reminders off in the extension\'s settings under \"Input Validation\"',
+            message: 'Ensure that there is input validation for this! You can turn these reminders off in the extension\'s settings under "Input Validation"',
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);
     }
-
-    const makefilePattern = /makefile/g
-    let makefileExists = false
-    while (m = makefilePattern.exec(text)){
-        makefileExists = true
+    // Check for the use of the makefile package
+    const makefilepattern = /makefile/g;
+    let makefileExists = false;
+    while ((m = makefilepattern.exec(text))) {
+        makefileExists = true;
     }
-
-    const mktempPattern = /mktemp\(*.+?\)/g
-    while ((m = mktempPattern.exec(text)) && problems < settings.maxNumberOfProblems && makefileExists) {
+    // Check for mktemp()
+    const mktemppattern = /mktemp\(*.+?\)/g;
+    while ((m = mktemppattern.exec(text)) && problems < settings.maxNumberOfProblems && makefileExists) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -146,12 +147,11 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: `${m[0]} can overwrite existing temp files, consider using mkstemp()`,
+            message: `${m[0]} can overwrite existing temp files, consider using mkstemp() (CVE-2023-2800)`,
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);
     }
-
     // Send the computed diagnostics to VSCode.
     connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 }

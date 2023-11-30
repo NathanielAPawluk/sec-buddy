@@ -112,7 +112,7 @@ export function activate(context: ExtensionContext) {
 
 	// Start the client. This will also launch the server
 	cclient.start();
-	pyclient.start()
+	pyclient.start();
 }
 
 export function deactivate(): Thenable<void> | undefined {
@@ -121,5 +121,6 @@ export function deactivate(): Thenable<void> | undefined {
 	} else if (!pyclient) {
 		return undefined;
 	}
-	return cclient.stop() && pyclient.stop();
+	cclient.stop();
+	pyclient.stop();
 }

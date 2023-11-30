@@ -87,7 +87,8 @@ function deactivate() {
     else if (!pyclient) {
         return undefined;
     }
-    return cclient.stop() && pyclient.stop();
+    cclient.stop();
+    pyclient.stop();
 }
 exports.deactivate = deactivate;
 //# sourceMappingURL=extension.js.map
