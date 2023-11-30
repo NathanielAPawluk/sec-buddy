@@ -65,7 +65,7 @@ connection.onDidChangeConfiguration(change => {
         documentSettings.clear();
     }
     else {
-        globalSettings = ((change.settings.languageServerExample || defaultSettings));
+        globalSettings = ((change.settings.secbuddy || defaultSettings));
     }
     // Revalidate all open text documents
     documents.all().forEach(validateTextDocument);
@@ -78,7 +78,7 @@ function getDocumentSettings(resource) {
     if (!result) {
         result = connection.workspace.getConfiguration({
             scopeUri: resource,
-            section: 'languageServerExample'
+            section: 'secbuddy'
         });
         documentSettings.set(resource, result);
     }
@@ -102,7 +102,8 @@ async function validateTextDocument(textDocument) {
     let m;
     let problems = 0;
     const diagnostics = [];
-    while ((m = strcpypattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+    while ((m = strcpypattern.exec(text)) && problems < settings.maxNumberOfProblems && 
+            settings.c.strcpy == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -118,7 +119,8 @@ async function validateTextDocument(textDocument) {
     // The validator creates diagnostics for gets()
     const getspattern = /gets\(*.+?\)/g;
 
-    while ((m = getspattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+    while ((m = getspattern.exec(text)) && problems < settings.maxNumberOfProblems && 
+    settings.c.gets == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -134,7 +136,8 @@ async function validateTextDocument(textDocument) {
     // The validator creates diagnostics for stpcpy()
     const stpcpypattern = /stpcpy\(*.+?\)/g;
 
-    while ((m = stpcpypattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+    while ((m = stpcpypattern.exec(text)) && problems < settings.maxNumberOfProblems && 
+    settings.c.stpcpy == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -150,7 +153,8 @@ async function validateTextDocument(textDocument) {
     // The validator creates diagnostics for strcat()
     const strcatpattern = /strcat\(*.+?\)/g;
 
-    while ((m = strcatpattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+    while ((m = strcatpattern.exec(text)) && problems < settings.maxNumberOfProblems && 
+    settings.c.strcat == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -166,7 +170,8 @@ async function validateTextDocument(textDocument) {
     // The validator creates diagnostics for strcmp()
     const strcmppattern = /strcmp\(*.+?\)/g;
 
-    while ((m = strcmppattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+    while ((m = strcmppattern.exec(text)) && problems < settings.maxNumberOfProblems && 
+    settings.c.strcmp == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -182,7 +187,8 @@ async function validateTextDocument(textDocument) {
     // The validator creates diagnostics for sprintf()
     const sprintfpattern = /sprintf\(*.+?\)/g;
 
-    while ((m = sprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+    while ((m = sprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems && 
+    settings.c.sprintf == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,
@@ -198,7 +204,8 @@ async function validateTextDocument(textDocument) {
     // The validator creates diagnostics for vsprintf()
     const vsprintfpattern = /vsprintf\(*.+?\)/g;
 
-    while ((m = vsprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+    while ((m = vsprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems && 
+    settings.c.vsprintf == true) {
         problems++;
         const diagnostic = {
             severity: node_1.DiagnosticSeverity.Warning,

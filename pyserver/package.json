@@ -1,0 +1,17 @@
+{
+	"name": "sec-buddy",
+	"description": "Real time security verification for programmers.",
+	"version": "0.1.1",
+	"engines": {
+		"node": "*"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/NathanielAPawluk/sec-buddy"
+	},
+	"dependencies": {
+		"vscode-languageserver": "^8.1.0",
+		"vscode-languageserver-textdocument": "^1.0.8"
+	},
+	"scripts": {}
+}
