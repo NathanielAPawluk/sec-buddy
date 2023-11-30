@@ -14,7 +14,8 @@ import {
 	TransportKind
 } from 'vscode-languageclient/node';
 
-let client: LanguageClient;
+let cclient: LanguageClient;
+let pyclient: LanguageClient;
 
 export function activate(context: ExtensionContext) {
 	console.log('Sec-Buddy is now active');
@@ -41,45 +42,81 @@ export function activate(context: ExtensionContext) {
 		vscode.env.openExternal(vscode.Uri.parse('https://docs.google.com/spreadsheets/d/1GuXvdTbiaAUqEo6yg0PqPoB8BL2E7ebxp7SBiiyEnoo/edit?usp=sharing'))
 	}));
 	// The server is implemented in node
-	const serverModule = context.asAbsolutePath(
-		path.join('server', 'out', 'server.js')
+	const cserverModule = context.asAbsolutePath(
+		path.join('cserver', 'out', 'server.js')
 	);
 
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
-	const serverOptions: ServerOptions = {
-		run: { module: serverModule, transport: TransportKind.ipc },
+	const cserverOptions: ServerOptions = {
+		run: { module: cserverModule, transport: TransportKind.ipc },
 		debug: {
-			module: serverModule,
+			module: cserverModule,
 			transport: TransportKind.ipc,
 		}
 	};
 
 	// Options to control the language client
-	const clientOptions: LanguageClientOptions = {
+	const cclientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
 		documentSelector: [{ scheme: 'file', language: 'c' }],
 		synchronize: {
 			// Notify the server about file changes to '.clientrc files contained in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		}
-	};
+	};	
 
 	// Create the language client and start the client.
-	client = new LanguageClient(
+	cclient = new LanguageClient(
 		'languageServerExample',
 		'Language Server Example',
-		serverOptions,
-		clientOptions
+		cserverOptions,
+		cclientOptions
+	);
+
+	// The server is implemented in node
+	const pyserverModule = context.asAbsolutePath(
+		path.join('pyserver', 'out', 'server.js')
+	);
+
+	// If the extension is launched in debug mode then the debug server options are used
+	// Otherwise the run options are used
+	const pyserverOptions: ServerOptions = {
+		run: { module: pyserverModule, transport: TransportKind.ipc },
+		debug: {
+			module: pyserverModule,
+			transport: TransportKind.ipc,
+		}
+	};
+
+	// Options to control the language client
+	const pyclientOptions: LanguageClientOptions = {
+		// Register the server for plain text documents
+		documentSelector: [{ scheme: 'file', language: 'python' }],
+		synchronize: {
+			// Notify the server about file changes to '.clientrc files contained in the workspace
+			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
+		}
+	};	
+
+	// Create the language client and start the client.
+	pyclient = new LanguageClient(
+		'languageServerExample',
+		'Language Server Example',
+		pyserverOptions,
+		pyclientOptions
 	);
 
 	// Start the client. This will also launch the server
-	client.start();
+	cclient.start();
+	pyclient.start()
 }
 
 export function deactivate(): Thenable<void> | undefined {
-	if (!client) {
+	if (!cclient) {
+		return undefined;
+	} else if (!pyclient) {
 		return undefined;
 	}
-	return client.stop();
+	return cclient.stop() && pyclient.stop();
 }

@@ -9,7 +9,8 @@ const path = require("path");
 const vscode = require("vscode");
 const vscode_1 = require("vscode");
 const node_1 = require("vscode-languageclient/node");
-let client;
+let cclient;
+let pyclient;
 function activate(context) {
     console.log('Sec-Buddy is now active');
     // Intro command to introduce the user to the plugin
@@ -30,18 +31,18 @@ function activate(context) {
         vscode.env.openExternal(vscode.Uri.parse('https://docs.google.com/spreadsheets/d/1GuXvdTbiaAUqEo6yg0PqPoB8BL2E7ebxp7SBiiyEnoo/edit?usp=sharing'));
     }));
     // The server is implemented in node
-    const serverModule = context.asAbsolutePath(path.join('server', 'out', 'server.js'));
+    const cserverModule = context.asAbsolutePath(path.join('cserver', 'out', 'server.js'));
     // If the extension is launched in debug mode then the debug server options are used
     // Otherwise the run options are used
-    const serverOptions = {
-        run: { module: serverModule, transport: node_1.TransportKind.ipc },
+    const cserverOptions = {
+        run: { module: cserverModule, transport: node_1.TransportKind.ipc },
         debug: {
-            module: serverModule,
+            module: cserverModule,
             transport: node_1.TransportKind.ipc,
         }
     };
     // Options to control the language client
-    const clientOptions = {
+    const cclientOptions = {
         // Register the server for plain text documents
         documentSelector: [{ scheme: 'file', language: 'c' }],
         synchronize: {
@@ -50,16 +51,42 @@ function activate(context) {
         }
     };
     // Create the language client and start the client.
-    client = new node_1.LanguageClient('languageServerExample', 'Language Server Example', serverOptions, clientOptions);
+    cclient = new node_1.LanguageClient('languageServerExample', 'Language Server Example', cserverOptions, cclientOptions);
+    // The server is implemented in node
+    const pyserverModule = context.asAbsolutePath(path.join('pyserver', 'out', 'server.js'));
+    // If the extension is launched in debug mode then the debug server options are used
+    // Otherwise the run options are used
+    const pyserverOptions = {
+        run: { module: pyserverModule, transport: node_1.TransportKind.ipc },
+        debug: {
+            module: pyserverModule,
+            transport: node_1.TransportKind.ipc,
+        }
+    };
+    // Options to control the language client
+    const pyclientOptions = {
+        // Register the server for plain text documents
+        documentSelector: [{ scheme: 'file', language: 'python' }],
+        synchronize: {
+            // Notify the server about file changes to '.clientrc files contained in the workspace
+            fileEvents: vscode_1.workspace.createFileSystemWatcher('**/.clientrc')
+        }
+    };
+    // Create the language client and start the client.
+    pyclient = new node_1.LanguageClient('languageServerExample', 'Language Server Example', pyserverOptions, pyclientOptions);
     // Start the client. This will also launch the server
-    client.start();
+    cclient.start();
+    pyclient.start();
 }
 exports.activate = activate;
 function deactivate() {
-    if (!client) {
+    if (!cclient) {
         return undefined;
     }
-    return client.stop();
+    else if (!pyclient) {
+        return undefined;
+    }
+    return cclient.stop() && pyclient.stop();
 }
 exports.deactivate = deactivate;
 //# sourceMappingURL=extension.js.map
