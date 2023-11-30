@@ -30,10 +30,10 @@ Vulnerable functions need updated pattern checking for vulnerable functions. It 
 
 vsprintf() gets caught with both the sprintf() and vsprintf() vulnerabilites, labeling it twice.
 
-Occasionally the settings for specific C vulernabilities are read as false, even though they are set to true. After turning them off and on they function as normal.
+Occasionally the settings for specific C vulernabilities are read as false, even though they are set to true. After turning them off and on they function as normal. Fixed?
 
 ### Python
-Python vulnerabilities that are handled by true/false settings also fail to work properly until turned off and on again.
+Python vulnerabilities that are handled by true/false settings also fail to work properly until turned off and on again. Fixed?
 
 
 ## Links
