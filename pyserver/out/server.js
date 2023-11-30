@@ -55,7 +55,7 @@ connection.onInitialized(() => {
 // The global settings, used when the `workspace/configuration` request is not supported by the client.
 // Please note that this is not the case when using this server with the client provided in this example
 // but could happen with other clients.
-const defaultSettings = { maxNumberOfProblems: 1000, python: { errorMessages: true, inputValidation: true } };
+const defaultSettings = { maxNumberOfProblems: 1000, python: { errorMessages: true, inputValidation: true, version: "3.12.0" } };
 let globalSettings = defaultSettings;
 // Cache the settings of all open documents
 const documentSettings = new Map();
@@ -148,6 +148,31 @@ async function validateTextDocument(textDocument) {
                 end: textDocument.positionAt(m.index + m[0].length)
             },
             message: `${m[0]} can overwrite existing temp files, consider using mkstemp() (CVE-2023-2800)`,
+            source: 'sec-buddy'
+        };
+        diagnostics.push(diagnostic);
+    }
+    // Check for email.utils vulnerability
+    // Check python version
+    const cve2023_27043_versions = [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g];
+    const currentVersion = settings.python.version;
+    let vulnerableTo_cve2023_27043 = false;
+    for (let i = 0; i < cve2023_27043_versions.length; i++) {
+        if (currentVersion.search(cve2023_27043_versions[i]) != -1) {
+            vulnerableTo_cve2023_27043 = true;
+        }
+    }
+    // Check for email.utils functions
+    const emailutilspattern = /email\.utils/g;
+    while ((m = emailutilspattern.exec(text)) && problems < settings.maxNumberOfProblems && vulnerableTo_cve2023_27043) {
+        problems++;
+        const diagnostic = {
+            severity: node_1.DiagnosticSeverity.Warning,
+            range: {
+                start: textDocument.positionAt(m.index),
+                end: textDocument.positionAt(m.index + m[0].length)
+            },
+            message: `${m[0]} This package is vulnerable in your current version of python. Consider updating or avoid the use of email.utils.parsaddr() and email.utils.getaddresses() (CVE-2023-27043)`,
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);
