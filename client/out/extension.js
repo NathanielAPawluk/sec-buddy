@@ -30,6 +30,11 @@ function activate(context) {
         // Opens the Gantt Chart in the browser
         vscode.env.openExternal(vscode.Uri.parse('https://docs.google.com/spreadsheets/d/1GuXvdTbiaAUqEo6yg0PqPoB8BL2E7ebxp7SBiiyEnoo/edit?usp=sharing'));
     }));
+    // Bug Report
+    context.subscriptions.push(vscode.commands.registerCommand('sec-buddy.bug', () => {
+        // Opens the github issues page
+        vscode.env.openExternal(vscode.Uri.parse('https://github.com/NathanielAPawluk/sec-buddy/issues'));
+    }));
     // The server is implemented in node
     const cserverModule = context.asAbsolutePath(path.join('cserver', 'out', 'server.js'));
     // If the extension is launched in debug mode then the debug server options are used
