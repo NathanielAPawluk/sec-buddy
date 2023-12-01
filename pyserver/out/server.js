@@ -152,22 +152,24 @@ async function validateTextDocument(textDocument) {
         };
         diagnostics.push(diagnostic);
     }
+    /*
     // Check for email.utils vulnerability
     // Check python version
     const cve2023_27043_versions = [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g];
     const currentVersion = settings.python.version;
     let vulnerableTo_cve2023_27043 = false;
-    for (let i = 0; i < cve2023_27043_versions.length; i++) {
-        if (currentVersion.search(cve2023_27043_versions[i]) != -1) {
+    for(let i = 0; i < cve2023_27043_versions.length; i++){
+        if (currentVersion.search(cve2023_27043_versions[i]) != -1){
             vulnerableTo_cve2023_27043 = true;
         }
     }
-    // Check for email.utils functions
+
+    // Check for email.utils import
     const emailutilspattern = /email\.utils/g;
     while ((m = emailutilspattern.exec(text)) && problems < settings.maxNumberOfProblems && vulnerableTo_cve2023_27043) {
         problems++;
-        const diagnostic = {
-            severity: node_1.DiagnosticSeverity.Warning,
+        const diagnostic: Diagnostic = {
+            severity: DiagnosticSeverity.Warning,
             range: {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
@@ -176,6 +178,69 @@ async function validateTextDocument(textDocument) {
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);
+    }
+
+    // Look for urllib.parse vulnerability, starting with version
+    const cve2023_24329_versions = [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g];
+    let vulnerableTo_cve2023_24329 = false;
+    for(let i = 0; i < cve2023_24329_versions.length; i++){
+        if (currentVersion.search(cve2023_24329_versions[i]) != -1){
+            vulnerableTo_cve2023_24329 = true;
+        }
+    }
+
+    // Check for email.utils import
+    const urllibparsepattern = /urllib\.parse/g;
+    while ((m = urllibparsepattern.exec(text)) && problems < settings.maxNumberOfProblems && vulnerableTo_cve2023_24329) {
+        problems++;
+        const diagnostic: Diagnostic = {
+            severity: DiagnosticSeverity.Warning,
+            range: {
+                start: textDocument.positionAt(m.index),
+                end: textDocument.positionAt(m.index + m[0].length)
+            },
+            message: `${m[0]} This package is vulnerable in your current version of python. Consider updating or avoid the use of urllib.parse.urlparse() (CVE-2023-24329)`,
+            source: 'sec-buddy'
+        };
+        diagnostics.push(diagnostic);
+    }
+    */
+    const currentVersion = settings.python.version;
+    let vulnerabilities = [];
+    const cve2023_27043 = {
+        versions: [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g],
+        vulnerableTo: false,
+        pattern: /email\.utils/g,
+        errorMsg: `This package is vulnerable in your current version of python. Consider updating or avoid the use of email.utils.parsaddr() and email.utils.getaddresses() (CVE-2023-27043)`
+    };
+    vulnerabilities.push(cve2023_27043);
+    const cve2023_24329 = {
+        versions: [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g],
+        vulnerableTo: false,
+        pattern: /urllib\.parse/g,
+        errorMsg: 'This package is vulnerable in your current version of python. Consider updating or avoid the use of urllib.parse.urlparse() (CVE-2023-24329)`'
+    };
+    vulnerabilities.push(cve2023_24329);
+    for (let i = 0; i < vulnerabilities.length; i++) {
+        for (let j = 0; j < vulnerabilities[i].versions.length; i++) {
+            if (currentVersion.search(vulnerabilities[i].versions[j]) != -1) {
+                vulnerabilities[i].vulnerableTo = true;
+            }
+        }
+        while ((m = vulnerabilities[i].pattern.exec(text)) && problems < settings.maxNumberOfProblems
+            && vulnerabilities[i].vulnerableTo) {
+            problems++;
+            const diagnostic = {
+                severity: node_1.DiagnosticSeverity.Warning,
+                range: {
+                    start: textDocument.positionAt(m.index),
+                    end: textDocument.positionAt(m.index + m[0].length)
+                },
+                message: vulnerabilities[i].errorMsg,
+                source: 'sec-buddy'
+            };
+            diagnostics.push(diagnostic);
+        }
     }
     // Send the computed diagnostics to VSCode.
     connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });

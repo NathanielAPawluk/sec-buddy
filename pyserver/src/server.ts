@@ -14,7 +14,8 @@ import {
 	CompletionItemKind,
 	TextDocumentPositionParams,
 	TextDocumentSyncKind,
-	InitializeResult
+	InitializeResult,
+	Disposable
 } from 'vscode-languageserver/node';
 
 import {
@@ -91,6 +92,14 @@ interface python {
 interface defaultSettings {
 	maxNumberOfProblems: number;
 	python: python
+}
+
+// A building block for vulnerabilities
+interface vulnerability {
+	versions: RegExp[];
+	vulnerableTo: boolean;
+	pattern: RegExp;
+	errorMsg: string;
 }
 
 // The global settings, used when the `workspace/configuration` request is not supported by the client.
@@ -207,6 +216,8 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 		diagnostics.push(diagnostic);
 	}
 
+
+	/*
 	// Check for email.utils vulnerability
 	// Check python version
 	const cve2023_27043_versions = [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g];
@@ -218,7 +229,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 		}
 	}
 
-	// Check for email.utils functions
+	// Check for email.utils import
 	const emailutilspattern = /email\.utils/g;
 	while ((m = emailutilspattern.exec(text)) && problems < settings.maxNumberOfProblems && vulnerableTo_cve2023_27043) {
 		problems++;
@@ -232,6 +243,71 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 			source: 'sec-buddy'
 		};
 		diagnostics.push(diagnostic);
+	}
+
+	// Look for urllib.parse vulnerability, starting with version
+	const cve2023_24329_versions = [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g];
+	let vulnerableTo_cve2023_24329 = false;
+	for(let i = 0; i < cve2023_24329_versions.length; i++){
+		if (currentVersion.search(cve2023_24329_versions[i]) != -1){
+			vulnerableTo_cve2023_24329 = true;
+		}
+	}
+
+	// Check for email.utils import
+	const urllibparsepattern = /urllib\.parse/g;
+	while ((m = urllibparsepattern.exec(text)) && problems < settings.maxNumberOfProblems && vulnerableTo_cve2023_24329) {
+		problems++;
+		const diagnostic: Diagnostic = {
+			severity: DiagnosticSeverity.Warning,
+			range: {
+				start: textDocument.positionAt(m.index),
+				end: textDocument.positionAt(m.index + m[0].length)
+			},
+            message: `${m[0]} This package is vulnerable in your current version of python. Consider updating or avoid the use of urllib.parse.urlparse() (CVE-2023-24329)`,
+			source: 'sec-buddy'
+		};
+		diagnostics.push(diagnostic);
+	}
+	*/
+	const currentVersion = settings.python.version;
+	let vulnerabilities = [];
+	const cve2023_27043: vulnerability = {
+		versions: [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g],
+		vulnerableTo: false,
+		pattern: /email\.utils/g,
+		errorMsg: `This package is vulnerable in your current version of python. Consider updating or avoid the use of email.utils.parsaddr() and email.utils.getaddresses() (CVE-2023-27043)`
+	}
+	vulnerabilities.push(cve2023_27043);
+
+	const cve2023_24329: vulnerability = {
+		versions: [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g],
+		vulnerableTo: false,
+		pattern: /urllib\.parse/g,
+		errorMsg: 'This package is vulnerable in your current version of python. Consider updating or avoid the use of urllib.parse.urlparse() (CVE-2023-24329)`'
+	}
+	vulnerabilities.push(cve2023_24329);
+
+	for(let i = 0; i < vulnerabilities.length; i++){
+		for(let j = 0; j < vulnerabilities[i].versions.length; i++){
+			if (currentVersion.search(vulnerabilities[i].versions[j]) != -1){
+				vulnerabilities[i].vulnerableTo = true;
+			}
+		}
+		while ((m = vulnerabilities[i].pattern.exec(text)) && problems < settings.maxNumberOfProblems
+					&& vulnerabilities[i].vulnerableTo) {
+			problems++;
+			const diagnostic: Diagnostic = {
+				severity: DiagnosticSeverity.Warning,
+				range: {
+					start: textDocument.positionAt(m.index),
+					end: textDocument.positionAt(m.index + m[0].length)
+				},
+				message: vulnerabilities[i].errorMsg,
+				source: 'sec-buddy'
+			};
+			diagnostics.push(diagnostic);
+		}
 	}
 
 	// Send the computed diagnostics to VSCode.
