@@ -97,7 +97,6 @@ interface defaultSettings {
 // A building block for vulnerabilities
 interface vulnerability {
 	versions: RegExp[];
-	vulnerableTo: boolean;
 	pattern: RegExp;
 	errorMsg: string;
 }
@@ -216,86 +215,58 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 		diagnostics.push(diagnostic);
 	}
 
-
-	/*
-	// Check for email.utils vulnerability
-	// Check python version
-	const cve2023_27043_versions = [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g];
+	// CVE array that can be looped through for vulnerabilities
 	const currentVersion = settings.python.version;
-	let vulnerableTo_cve2023_27043 = false;
-	for(let i = 0; i < cve2023_27043_versions.length; i++){
-		if (currentVersion.search(cve2023_27043_versions[i]) != -1){
-			vulnerableTo_cve2023_27043 = true;
-		}
-	}
-
-	// Check for email.utils import
-	const emailutilspattern = /email\.utils/g;
-	while ((m = emailutilspattern.exec(text)) && problems < settings.maxNumberOfProblems && vulnerableTo_cve2023_27043) {
-		problems++;
-		const diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
-			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
-			},
-            message: `${m[0]} This package is vulnerable in your current version of python. Consider updating or avoid the use of email.utils.parsaddr() and email.utils.getaddresses() (CVE-2023-27043)`,
-			source: 'sec-buddy'
-		};
-		diagnostics.push(diagnostic);
-	}
-
-	// Look for urllib.parse vulnerability, starting with version
-	const cve2023_24329_versions = [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g];
-	let vulnerableTo_cve2023_24329 = false;
-	for(let i = 0; i < cve2023_24329_versions.length; i++){
-		if (currentVersion.search(cve2023_24329_versions[i]) != -1){
-			vulnerableTo_cve2023_24329 = true;
-		}
-	}
-
-	// Check for email.utils import
-	const urllibparsepattern = /urllib\.parse/g;
-	while ((m = urllibparsepattern.exec(text)) && problems < settings.maxNumberOfProblems && vulnerableTo_cve2023_24329) {
-		problems++;
-		const diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
-			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
-			},
-            message: `${m[0]} This package is vulnerable in your current version of python. Consider updating or avoid the use of urllib.parse.urlparse() (CVE-2023-24329)`,
-			source: 'sec-buddy'
-		};
-		diagnostics.push(diagnostic);
-	}
-	*/
-	const currentVersion = settings.python.version;
-	let vulnerabilities = [];
+	const vulnerabilities = [];
 	const cve2023_27043: vulnerability = {
 		versions: [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g],
-		vulnerableTo: false,
 		pattern: /email\.utils/g,
 		errorMsg: `This package is vulnerable in your current version of python. Consider updating or avoid the use of email.utils.parsaddr() and email.utils.getaddresses() (CVE-2023-27043)`
-	}
+	};
 	vulnerabilities.push(cve2023_27043);
 
 	const cve2023_24329: vulnerability = {
 		versions: [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g],
-		vulnerableTo: false,
 		pattern: /urllib\.parse/g,
-		errorMsg: 'This package is vulnerable in your current version of python. Consider updating or avoid the use of urllib.parse.urlparse() (CVE-2023-24329)`'
-	}
+		errorMsg: 'This package is vulnerable in your current version of python. Consider updating or avoid the use of urllib.parse.urlparse() (CVE-2023-24329)'
+	};
 	vulnerabilities.push(cve2023_24329);
 
-	for(let i = 0; i < vulnerabilities.length; i++){
-		for(let j = 0; j < vulnerabilities[i].versions.length; i++){
+	const cve2022_37454: vulnerability = {
+		versions: [/3\.[0-6]\./, /2\.[0-7]\./, /1\.[0-6]\./, /\b3\.[7-9]\.[0-9]\b/, /\b3\.[7-9]\.1[0-5]\b/, /\b3\.10\.[0-8]\b/],
+		pattern: /hashlib/g,
+		errorMsg: 'This package is vulnerable in your current version of python. Consider updating or avoid the use of hashlib.sha3_224 (CVE-2022-37454)'
+	};
+	vulnerabilities.push(cve2022_37454);
+
+	const cve2022_45061: vulnerability = {
+		versions: [/3\.[0-6]\./, /2\.[0-7]\./, /1\.[0-6]\./, /\b3\.[7-9]\.[0-9]\b/, /\b3\.[7-9]\.1[0-5]\b/, /\b3\.10\.[0-8]\b/, /\b3\.11\.0\b/],
+		pattern: /decode\('idna'\)/g,
+		errorMsg: 'This method of decoding uses a quadratic formula and can lead to slow execution time. Consider updating your version (CVE-2022-45061)'
+	};
+	vulnerabilities.push(cve2022_45061);
+
+	const cve2022_42919: vulnerability = {
+		versions: [/\b3\.9\.[0-9]\b/, /\b3\.9\.1[0-5]\b/, /\b3\.10.[0-8]\b/, ],
+		pattern: /multiprocessing\.util/g,
+		errorMsg: 'This package is vulnerable in your current version of python. Forkserver may allow for privilege escalation attacks when executed on Linux systems (CVE-2022-42919)'
+	};
+	vulnerabilities.push(cve2022_42919);
+
+	const cve2020_10735: vulnerability = {
+		versions: [/3\.[0-6]\./, /2\.[0-7]\./, /1\.[0-6]\./, /\b3\.[7-9]\.[0-9]\b/, /\b3\.[7-9]\.1[0-3]\b/, /\b3\.10\.[0-6]\b/],
+		pattern: /int\("*.+?"\)/g,
+		errorMsg: 'This method has a quadratic time formula in your version of python. This can be abused for a DOS attack. Consider updating your version or adding a limit to the amount of characters used by this function (CVE-2020-10735)'
+	};
+
+	for (let i = 0; i < vulnerabilities.length; i++){
+		let vulnerable = false;
+		for (let j = 0; j < vulnerabilities[i].versions.length; j++){
 			if (currentVersion.search(vulnerabilities[i].versions[j]) != -1){
-				vulnerabilities[i].vulnerableTo = true;
+				vulnerable = true;
 			}
 		}
-		while ((m = vulnerabilities[i].pattern.exec(text)) && problems < settings.maxNumberOfProblems
-					&& vulnerabilities[i].vulnerableTo) {
+		while ((m = vulnerabilities[i].pattern.exec(text)) && problems < settings.maxNumberOfProblems && vulnerable) {
 			problems++;
 			const diagnostic: Diagnostic = {
 				severity: DiagnosticSeverity.Warning,
