@@ -3,6 +3,7 @@
 This project has been created as part of my studies in cyber security. I have a passion for programming and wanted to make an accessable tool that can parse code in real time to detect potential security threats.
 I will be periodically updating this program for the remainder of the year (2023). This extension will work with C and Python.
 
+Currently, the extension is capable of parsing C files for known vulnerable functions, such as strcpy(), and recommends replacement functions that are not vulnerable. It can also search for common python vulnerabilities, as well as known vulnerable packages based on the python version (which can be set in settings for the application). The python database was built primarily using https://python-security.readthedocs.io/vulnerabilities.html, which contains extension information on past python issues. When one of the vulnerable packages are found in a python file, the error message also provides the Common Vulnerabilities and Exposures (CVE) identifier, which can be used to gather more information on the vulnerability.
 
 ## Testing
 
