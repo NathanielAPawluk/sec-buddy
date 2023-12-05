@@ -152,6 +152,7 @@ async function validateTextDocument(textDocument) {
         };
         diagnostics.push(diagnostic);
     }
+    // CVE array that can be looped through for package vulnerabilities
     const currentVersion = settings.python.version;
     const vulnerabilities = [];
     const cve2023_27043 = {
@@ -173,17 +174,41 @@ async function validateTextDocument(textDocument) {
     };
     vulnerabilities.push(cve2022_37454);
     const cve2022_45061 = {
-        versions: [/3\.[0-6]\./, /2\.[0-7]\./, /1\.[0-6]\./, /b3\.[7-9]\.[0-9]\b/, /b3\.[7-9]\.1[0-5]\b/, /\b3\.10\.[0-8]\b/, /\b3\.11\.0\b/],
-        pattern: /decode\('idna'\)/,
+        versions: [/3\.[0-6]\./, /2\.[0-7]\./, /1\.[0-6]\./, /\b3\.[7-9]\.[0-9]\b/, /\b3\.[7-9]\.1[0-5]\b/, /\b3\.10\.[0-8]\b/, /\b3\.11\.0\b/],
+        pattern: /decode\('idna'\)/g,
         errorMsg: 'This method of decoding uses a quadratic formula and can lead to slow execution time. Consider updating your version (CVE-2022-45061)'
     };
     vulnerabilities.push(cve2022_45061);
     const cve2022_42919 = {
-        versions: [/\b3\.9\.[0-9]\b/, /\b3\.9\.1[0-5]\b/, /\b3\.10.[0-8]\b/],
-        pattern: /multiprocessing\.util/,
+        versions: [/\b3\.9\.[0-9]\b/, /\b3\.9\.1[0-5]\b/, /\b3\.10.[0-8]\b/,],
+        pattern: /multiprocessing\.util/g,
         errorMsg: 'This package is vulnerable in your current version of python. Forkserver may allow for privilege escalation attacks when executed on Linux systems (CVE-2022-42919)'
     };
     vulnerabilities.push(cve2022_42919);
+    const cve2020_10735 = {
+        versions: [/3\.[0-6]\./, /2\.[0-7]\./, /1\.[0-6]\./, /\b3\.[7-9]\.[0-9]\b/, /\b3\.[7-9]\.1[0-3]\b/, /\b3\.10\.[0-6]\b/],
+        pattern: /int\("*.+?"\)/g,
+        errorMsg: 'This method has a quadratic time formula in your version of python. This can be abused for a DOS attack. Consider updating your version or adding a limit to the amount of characters used by this function (CVE-2020-10735)'
+    };
+    vulnerabilities.push(cve2020_10735);
+    const cve2018_25032 = {
+        versions: [/\b3\.[7-9]\.[0-9]\b/, /\b3\.[7-9]\.1[0-3]\b/, /\b3\.[7-8]\.14\b/, /\b3\.10\.[0-4]\b/],
+        pattern: /zlib/g,
+        errorMsg: 'This package is vulnerable in your current version of python. Zlib contains an out-of-bounds access flaw, which can allow memory corruption (CVE-2018-25032)'
+    };
+    vulnerabilities.push(cve2018_25032);
+    const cve2016_3189 = {
+        versions: [/\b3\.[7-9]\.[0-9]\b/, /\b3\.[7-9]\.1[0-1]\b/, /\b3\.[7-8]\.[2-3]\b/, /\b3\.10\.[0-3]\b/],
+        pattern: /bz2/g,
+        errorMsg: 'This package is vulnerable in your current version of python. This version of bzip2 allows for remote DoS attacks (CVE-2016-3189)'
+    };
+    vulnerabilities.push(cve2016_3189);
+    const cve2019_12900 = {
+        versions: [/\b3\.[7-9]\.[0-9]\b/, /\b3\.[7-9]\.1[0-1]\b/, /\b3\.[7-8]\.[2-3]\b/, /\b3\.10\.[0-3]\b/],
+        pattern: /bz2/g,
+        errorMsg: 'This package is vulnerable in your current version of python. TThis version of bzip allows for out-of-bounds writes when decompressing (CVE-2019-12900)'
+    };
+    vulnerabilities.push(cve2019_12900);
     for (let i = 0; i < vulnerabilities.length; i++) {
         let vulnerable = false;
         for (let j = 0; j < vulnerabilities[i].versions.length; j++) {
