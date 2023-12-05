@@ -111,7 +111,7 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: `Error messages can lead to vulnerabilities if this code is used as part of a client. To turn these messages off, go to the extensions settings and disable "Error Message Checks"`,
+            message: `Error messages can lead to vulnerabilities if this code is used as part of a client. To turn these messages off, go to the extension\'s settings and disable "Error Message Checks"`,
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);
@@ -156,7 +156,7 @@ async function validateTextDocument(textDocument) {
     const currentVersion = settings.python.version;
     const vulnerabilities = [];
     const cve2023_27043 = {
-        versions: [/3\.10\./g, /3\.9\./g, /3\.8\./g, /3\.7\./g],
+        versions: [/3\.10\./g, /3\.[7-9]\./g],
         pattern: /email\.utils/g,
         errorMsg: `This package is vulnerable in your current version of python. Consider updating or avoid the use of email.utils.parsaddr() and email.utils.getaddresses() (CVE-2023-27043)`
     };
@@ -209,6 +209,12 @@ async function validateTextDocument(textDocument) {
         errorMsg: 'This package is vulnerable in your current version of python. TThis version of bzip allows for out-of-bounds writes when decompressing (CVE-2019-12900)'
     };
     vulnerabilities.push(cve2019_12900);
+    const cve2013_0340 = {
+        versions: [/\b3\.[6-8].[0-9]\b/, /\b3\.[6-8]\.1[0-2]\b/, /\b3\.6\.1[3-5]\b/, /\b3\.9\.[0-7]\b/],
+        pattern: /xml/g,
+        errorMsg: 'This package is vulnerable in your current version of python. This package is vulnerable to the XML billion laughs attack when using parser.expat (CVE-2013-0340)'
+    };
+    vulnerabilities.push(cve2013_0340);
     for (let i = 0; i < vulnerabilities.length; i++) {
         let vulnerable = false;
         for (let j = 0; j < vulnerabilities[i].versions.length; j++) {
