@@ -158,7 +158,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	const diagnostics: Diagnostic[] = [];
 
 	// Check for strcpy()
-	const strcpypattern = /strcpy\(*.+?\)/g;
+	const strcpypattern = /\bstrcpy\(*.+?\)\b/g;
 	while ((m = strcpypattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.strcpy == true) {
 		problems++;
 		const diagnostic: Diagnostic = {
@@ -175,7 +175,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	}
 
 	// Check for gets()
-	const getspattern = /gets\(*.+?\)/g;
+	const getspattern = /\bgets\(*.+?\)\b/g;
 	while ((m = getspattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.gets == true) {
 		problems++;
 		const diagnostic: Diagnostic = {
@@ -192,7 +192,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	}
 
 	// Check for stpcpy()
-	const stpcpypattern = /stpcpy\(*.+?\)/g;
+	const stpcpypattern = /\bstpcpy\(*.+?\)\b/g;
 	while ((m = stpcpypattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.stpcpy == true) {
 		problems++;
 		const diagnostic: Diagnostic = {
@@ -209,7 +209,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	}
 
 	// Check for strcat()
-	const strcatpattern = /strcat\(*.+?\)/g;
+	const strcatpattern = /\bstrcat\(*.+?\)\b/g;
 	while ((m = strcatpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.strcat == true) {
 		problems++;
 		const diagnostic: Diagnostic = {
@@ -226,7 +226,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	}
 
 	// Check for strcmp()
-	const strcmppattern = /strcmp\(*.+?\)/g;
+	const strcmppattern = /\bstrcmp\(*.+?\)\b/g;
 	while ((m = strcmppattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.strcmp == true) {
 		problems++;
 		const diagnostic: Diagnostic = {
@@ -260,7 +260,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	}
 
 	// Check for vsprintf()
-	const vsprintfpattern = /vsprintf\(*.+?\)/g;
+	const vsprintfpattern = /\bvsprintf\(*.+?\)\b/g;
 	while ((m = vsprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.vsprintf == true) {
 		problems++;
 		const diagnostic: Diagnostic = {
