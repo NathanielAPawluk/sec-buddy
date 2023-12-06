@@ -178,7 +178,7 @@ async function validateTextDocument(textDocument) {
         diagnostics.push(diagnostic);
     }
     // Check for sprintf()
-    const sprintfpattern = /sprintf\(*.+?\)/g;
+    const sprintfpattern = /\bsprintf\(*.+?\)\b/g;
     while ((m = sprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.sprintf == true) {
         problems++;
         const diagnostic = {

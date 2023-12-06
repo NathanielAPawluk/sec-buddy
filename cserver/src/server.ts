@@ -243,7 +243,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	}
 
 	// Check for sprintf()
-	const sprintfpattern = /sprintf\(*.+?\)/g;
+	const sprintfpattern = /\bsprintf\(*.+?\)\b/g;
 	while ((m = sprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.sprintf == true) {
 		problems++;
 		const diagnostic: Diagnostic = {
