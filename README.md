@@ -44,24 +44,24 @@ Python vulnerabilities that are handled by true/false settings also fail to work
 
 ## Currently Handled CVE's
 
-CVE-2023-27043
+[CVE-2023-27043](https://nvd.nist.gov/vuln/detail/cve-2023-27043)
 
-CVE-2023-24329
+[CVE-2023-24329](https://nvd.nist.gov/vuln/detail/cve-2023-24329)
 
-CVE-2022-37454
+[CVE-2022-37454](https://nvd.nist.gov/vuln/detail/cve-2022-37454)
 
-CVE-2022-45061
+[CVE-2022-45061](https://nvd.nist.gov/vuln/detail/cve-2022-45061)
 
-CVE-2022-42919
+[CVE-2022-42919](https://nvd.nist.gov/vuln/detail/cve-2022-42919)
 
-CVE-2020-10735
+[CVE-2020-10735](https://nvd.nist.gov/vuln/detail/cve-2020-10735)
 
-CVE-2018-25032
+[CVE-2018-25032](https://nvd.nist.gov/vuln/detail/cve-2018-25032)
 
-CVE-2016-3189
+[CVE-2016-3189](https://nvd.nist.gov/vuln/detail/cve-2016-3189)
 
-CVE-2019-12900
+[CVE-2019-12900](https://nvd.nist.gov/vuln/detail/cve-2019-12900)
 
-CVE-2013-0340
+[CVE-2013-0340](https://nvd.nist.gov/vuln/detail/cve-2013-0340)
 
-CVE-2021-3737
+[CVE-2021-3737](https://nvd.nist.gov/vuln/detail/cve-2021-3737)
