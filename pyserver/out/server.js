@@ -220,6 +220,7 @@ async function validateTextDocument(textDocument) {
         pattern: /\burllib\.request\b/,
         errorMsg: 'This package is vulnerable in your current version of python. HTTP requests can enter an infinite loop (CVE-2021-3737)'
     };
+    vulnerabilities.push(cve2021_3737);
     for (let i = 0; i < vulnerabilities.length; i++) {
         let vulnerable = false;
         for (let j = 0; j < vulnerabilities[i].versions.length; j++) {
