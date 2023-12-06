@@ -19,7 +19,7 @@ npm run compile
 code .
 ```
 
-Once this has been done, you can open it in Visual Studio Code. Build the application by pressing Ctrl+Shift+B. Once it has finished running, press F5 to open the test build. 
+The final command should open the folder in VS Code. Build the application by pressing Ctrl+Shift+B. Once it has finished running, press F5 to open the test build. 
 
 Currently, this works for C and Python files, locating known vulnerable functions. This also comes with a few built-in commands that can redirect you to important links regarding the project. You can also find them at the end of this document.
 
@@ -42,3 +42,16 @@ Python vulnerabilities that are handled by true/false settings also fail to work
 
 [Product Backlog](https://docs.google.com/document/d/1ajQbIBILqC7eJM0Bc9Ylj9J7tyNvx90QQ41-XbVyMLs/edit?usp=sharing)
 
+## Currently Handled CVE's
+
+CVE-2023-27043
+CVE-2023-24329
+CVE-2022-37454
+CVE-2022-45061
+CVE-2022-42919
+CVE-2020-10735
+CVE-2018-25032
+CVE-2016-3189
+CVE-2019-12900
+CVE-2013-0340
+CVE-2021-3737
