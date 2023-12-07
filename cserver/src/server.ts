@@ -97,6 +97,12 @@ interface serverSettings {
 	c: c;
 }
 
+interface vulnerability {
+	pattern: RegExp;
+	errorMsg: string;
+	active: boolean;
+}
+
 // The global settings, used when the `workspace/configuration` request is not supported by the client.
 // Please note that this is not the case when using this server with the client provided in this example
 // but could happen with other clients.
@@ -157,124 +163,74 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	let problems = 0;
 	const diagnostics: Diagnostic[] = [];
 
-	// Check for strcpy()
-	const strcpypattern = /\bstrcpy\(*.+?\)\b/g;
-	while ((m = strcpypattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.strcpy == true) {
-		problems++;
-		const diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
-			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
-			},
-			message: `${m[0]} is vulnerable. Consider using strncpy().`,
-			source: 'sec-buddy'
-		};
-		
-		diagnostics.push(diagnostic);
+
+	let vulnerabilities = []
+
+	const strcpy: vulnerability = {
+		pattern: /\bstrcpy\(*.+?\)\b/g,
+		errorMsg: `strcpy() is vulnerable to buffer overflow attacks. Consider using strncpy().`,
+		active: settings.c.strcpy
+	}
+	vulnerabilities.push(strcpy);
+
+	const gets: vulnerability = {
+		pattern: /\bgets\(*.+?\)\b/g,
+		errorMsg: 'gets() is vulnerable to buffer overflow attacks. Consider using fgets().',
+		active: settings.c.gets		
+	}
+	vulnerabilities.push(gets);
+
+	const stpcpy: vulnerability = {
+		pattern: /\bstpcpy\(*.+?\)\b/g,
+		errorMsg: 'stpcpy() is vulnerable to buffer overflow attacks. Consider using stpncpy().',
+		active: settings.c.stpcpy
+	}
+	vulnerabilities.push(stpcpy);
+
+	const strcat: vulnerability = {
+		pattern: /\bstrcat\(*.+?\)\b/g,
+		errorMsg: 'strcat() is vulnerable to buffer overflow attacks. Consider using strncat().',
+		active: settings.c.strcat
+	}
+	vulnerabilities.push(strcat);
+
+	const strcmp: vulnerability = {
+		pattern: /\bstrcmp\(*.+?\)\b/g,
+		errorMsg: 'strcmp() is vulnerable to buffer overflow attacks. Consider using strncmp().',
+		active: settings.c.strcmp
+	}
+	vulnerabilities.push(strcmp);
+
+	const sprintf: vulnerability = {
+		pattern: /\bsprintf\(*.+?\)\b/g,
+		errorMsg: 'sprintf() is vulnerable to buffer overflow attacks. Consider using snprintf().',
+		active: settings.c.sprintf
+	}
+	vulnerabilities.push(sprintf);
+
+	const vsprintf: vulnerability = {
+		pattern: /\bvsprintf\(*.+?\)\b/g,
+		errorMsg: 'vsprintf() is vulnerable to buffer overflow attacks. Consider using snprintf().',
+		active: settings.c.vsprintf
+	}
+	vulnerabilities.push(vsprintf);
+	
+	for (let i = 0; i < vulnerabilities.length; i++){
+		while ((m = vulnerabilities[i].pattern.exec(text)) && problems < settings.maxNumberOfProblems && vulnerabilities[i].active) {
+			problems++;
+			const diagnostic: Diagnostic = {
+				severity: DiagnosticSeverity.Warning,
+				range: {
+					start: textDocument.positionAt(m.index),
+					end: textDocument.positionAt(m.index + m[0].length)
+				},
+				message: vulnerabilities[i].errorMsg,
+				source: 'sec-buddy'
+			};
+			diagnostics.push(diagnostic);
+		}
 	}
 
-	// Check for gets()
-	const getspattern = /\bgets\(*.+?\)\b/g;
-	while ((m = getspattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.gets == true) {
-		problems++;
-		const diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
-			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
-			},
-			message: `${m[0]} is vulnerable. Consider using fgets().`,
-			source: 'sec-buddy'
-		};
-
-		diagnostics.push(diagnostic);
-	}
-
-	// Check for stpcpy()
-	const stpcpypattern = /\bstpcpy\(*.+?\)\b/g;
-	while ((m = stpcpypattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.stpcpy == true) {
-		problems++;
-		const diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
-			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
-			},
-			message: `${m[0]} is vulnerable. Consider using stpncpy().`,
-			source: 'sec-buddy'
-		};
-
-		diagnostics.push(diagnostic);
-	}
-
-	// Check for strcat()
-	const strcatpattern = /\bstrcat\(*.+?\)\b/g;
-	while ((m = strcatpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.strcat == true) {
-		problems++;
-		const diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
-			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
-			},
-			message: `${m[0]} is vulnerable. Consider using strncat().`,
-			source: 'sec-buddy'
-		};
-
-		diagnostics.push(diagnostic);
-	}
-
-	// Check for strcmp()
-	const strcmppattern = /\bstrcmp\(*.+?\)\b/g;
-	while ((m = strcmppattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.strcmp == true) {
-		problems++;
-		const diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
-			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
-			},
-			message: `${m[0]} is vulnerable. Consider using strncmp().`,
-			source: 'sec-buddy'
-		};
-
-		diagnostics.push(diagnostic);
-	}
-
-	// Check for sprintf()
-	const sprintfpattern = /\bsprintf\(*.+?\)\b/g;
-	while ((m = sprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.sprintf == true) {
-		problems++;
-		const diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
-			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
-			},
-			message: `${m[0]} is vulnerable. Consider using snprintf().`,
-			source: 'sec-buddy'
-		};
-
-		diagnostics.push(diagnostic);
-	}
-
-	// Check for vsprintf()
-	const vsprintfpattern = /\bvsprintf\(*.+?\)\b/g;
-	while ((m = vsprintfpattern.exec(text)) && problems < settings.maxNumberOfProblems && settings.c.vsprintf == true) {
-		problems++;
-		const diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
-			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
-			},
-			message: `${m[0]} is vulnerable. Consider using snprintf().`,
-			source: 'sec-buddy'
-		};
-
-		diagnostics.push(diagnostic);
-	}
 
 	// Send the computed diagnostics to VSCode.
 	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
