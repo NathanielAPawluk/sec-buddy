@@ -9,15 +9,8 @@ The current implementation of this plugin utilizes a built-in language server, w
 
 ## Known Issues
 ### C
-Vulnerable functions need updated pattern checking for vulnerable functions. It currently starts the pattern check from anywhere in a line, so a function such as fgets() gets flagged for the gets() vulnerability.
-
-vsprintf() gets caught with both the sprintf() and vsprintf() vulnerabilites, labeling it twice.
 
 Occasionally the settings for specific C vulernabilities are read as false, even though they are set to true. After turning them off and on they function as normal. Fixed?
-
-### Python
-Python vulnerabilities that are handled by true/false settings also fail to work properly until turned off and on again. Fixed?
-
 
 ## Links
 [Gantt Chart outlining my desired timeline](https://docs.google.com/spreadsheets/d/1GuXvdTbiaAUqEo6yg0PqPoB8BL2E7ebxp7SBiiyEnoo/edit?usp=sharing)
