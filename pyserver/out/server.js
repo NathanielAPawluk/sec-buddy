@@ -111,7 +111,7 @@ async function validateTextDocument(textDocument) {
                 start: textDocument.positionAt(m.index),
                 end: textDocument.positionAt(m.index + m[0].length)
             },
-            message: `Error messages can lead to vulnerabilities if this code is used as part of a client. To turn these messages off, go to the extension\'s settings and disable "Error Message Checks"`,
+            message: `Error messages can lead to vulnerabilities if this code is used as part of a client. To turn these messages off, go to the extension's settings and disable "Error Message Checks"`,
             source: 'sec-buddy'
         };
         diagnostics.push(diagnostic);

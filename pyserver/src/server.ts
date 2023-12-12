@@ -170,7 +170,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 				start: textDocument.positionAt(m.index),
 				end: textDocument.positionAt(m.index + m[0].length)
 			},
-			message: `Error messages can lead to vulnerabilities if this code is used as part of a client. To turn these messages off, go to the extension\'s settings and disable "Error Message Checks"`,
+			message: `Error messages can lead to vulnerabilities if this code is used as part of a client. To turn these messages off, go to the extension's settings and disable "Error Message Checks"`,
 			source: 'sec-buddy'
 		};
 		diagnostics.push(diagnostic);
@@ -264,35 +264,35 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 		versions: [/\b3\.[7-9]\.[0-9]\b/, /\b3\.[7-9]\.1[0-3]\b/, /\b3\.[7-8]\.14\b/, /\b3\.10\.[0-4]\b/],
 		pattern: /zlib/g,
 		errorMsg: 'This package is vulnerable in your current version of python. Zlib contains an out-of-bounds access flaw, which can allow memory corruption (CVE-2018-25032)'
-	}
+	};
 	vulnerabilities.push(cve2018_25032);
 
 	const cve2016_3189: vulnerability = {
 		versions: [/\b3\.[7-9]\.[0-9]\b/, /\b3\.[7-9]\.1[0-1]\b/, /\b3\.[7-8]\.[2-3]\b/, /\b3\.10\.[0-3]\b/],
 		pattern: /bz2/g,
 		errorMsg: 'This package is vulnerable in your current version of python. This version of bzip2 allows for remote DoS attacks (CVE-2016-3189)'
-	}
+	};
 	vulnerabilities.push(cve2016_3189);
 
 	const cve2019_12900: vulnerability = {
 		versions: [/\b3\.[7-9]\.[0-9]\b/, /\b3\.[7-9]\.1[0-1]\b/, /\b3\.[7-8]\.[2-3]\b/, /\b3\.10\.[0-3]\b/],
 		pattern: /bz2/g,
 		errorMsg: 'This package is vulnerable in your current version of python. TThis version of bzip allows for out-of-bounds writes when decompressing (CVE-2019-12900)'
-	}
+	};
 	vulnerabilities.push(cve2019_12900);
 
 	const cve2013_0340: vulnerability = {
 		versions: [/\b3\.[6-8].[0-9]\b/, /\b3\.[6-8]\.1[0-2]\b/, /\b3\.6\.1[3-5]\b/, /\b3\.9\.[0-7]\b/],
 		pattern: /xml/g,
 		errorMsg: 'This package is vulnerable in your current version of python. This package is vulnerable to the XML billion laughs attack when using parser.expat (CVE-2013-0340)'
-	}
+	};
 	vulnerabilities.push(cve2013_0340);
 
 	const cve2021_3737: vulnerability = {
 		versions: [/\b3\.[6-8]\.[0-9]\b/, /\b3\.6\.1[0-4]\b/, /\b3\.[7-8]\.1[0-1]\b/, /\b3\.9\.[0-6]\b/],
 		pattern: /\burllib\.request\b/,
 		errorMsg: 'This package is vulnerable in your current version of python. HTTP requests can enter an infinite loop (CVE-2021-3737)'
-	}
+	};
 	vulnerabilities.push(cve2021_3737);
 
 

@@ -5,25 +5,7 @@ I will be periodically updating this program for the remainder of the year (2023
 
 Currently, the extension is capable of parsing C files for known vulnerable functions, such as strcpy(), and recommends replacement functions that are not vulnerable. It can also search for common python vulnerabilities, as well as known vulnerable packages based on the python version (which can be set in settings for the application). The python database was built primarily using https://python-security.readthedocs.io/vulnerabilities.html, which contains extension information on past python issues. When one of the vulnerable packages are found in a python file, the error message also provides the Common Vulnerabilities and Exposures (CVE) identifier, which can be used to gather more information on the vulnerability.
 
-## Testing
-
 The current implementation of this plugin utilizes a built-in language server, which may end up getting ported over to other IDE's in the future (this project has been made for Visual Studio Code). This is being built upon the lsp-sample provided by Visual Studio.
-
-This has not yet been released publicly. If you want to test it out, use the following commands:
-
-```
-git clone https://github.com/NathanielAPawluk/sec-buddy
-cd sec-buddy
-npm install
-npm run compile
-code .
-```
-
-The final command should open the folder in VS Code. Build the application by pressing Ctrl+Shift+B. Once it has finished running, press F5 to open the test build. 
-
-Currently, this works for C and Python files, locating known vulnerable functions. This also comes with a few built-in commands that can redirect you to important links regarding the project. You can also find them at the end of this document.
-
-The plugin features an extensive list of settings, allowing users to disable errors for functions that they want to ignore. This is not advised, but has been made available for accessibility. 
 
 ## Known Issues
 ### C

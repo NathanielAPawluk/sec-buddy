@@ -102,45 +102,45 @@ async function validateTextDocument(textDocument) {
     let m;
     let problems = 0;
     const diagnostics = [];
-    let vulnerabilities = [];
+    const vulnerabilities = [];
     const strcpy = {
-        pattern: /\bstrcpy\(*.+?\)\b/g,
+        pattern: /\bstrcpy\(*.+?\)/g,
         errorMsg: `strcpy() is vulnerable to buffer overflow attacks. Consider using strncpy().`,
         active: settings.c.strcpy
     };
     vulnerabilities.push(strcpy);
     const gets = {
-        pattern: /\bgets\(*.+?\)\b/g,
+        pattern: /\bgets\(*.+?\)/g,
         errorMsg: 'gets() is vulnerable to buffer overflow attacks. Consider using fgets().',
         active: settings.c.gets
     };
     vulnerabilities.push(gets);
     const stpcpy = {
-        pattern: /\bstpcpy\(*.+?\)\b/g,
+        pattern: /\bstpcpy\(*.+?\)/g,
         errorMsg: 'stpcpy() is vulnerable to buffer overflow attacks. Consider using stpncpy().',
         active: settings.c.stpcpy
     };
     vulnerabilities.push(stpcpy);
     const strcat = {
-        pattern: /\bstrcat\(*.+?\)\b/g,
+        pattern: /\bstrcat\(*.+?\)/g,
         errorMsg: 'strcat() is vulnerable to buffer overflow attacks. Consider using strncat().',
         active: settings.c.strcat
     };
     vulnerabilities.push(strcat);
     const strcmp = {
-        pattern: /\bstrcmp\(*.+?\)\b/g,
+        pattern: /\bstrcmp\(*.+?\)/g,
         errorMsg: 'strcmp() is vulnerable to buffer overflow attacks. Consider using strncmp().',
         active: settings.c.strcmp
     };
     vulnerabilities.push(strcmp);
     const sprintf = {
-        pattern: /\bsprintf\(*.+?\)\b/g,
+        pattern: /\bsprintf\(*.+?\)/g,
         errorMsg: 'sprintf() is vulnerable to buffer overflow attacks. Consider using snprintf().',
         active: settings.c.sprintf
     };
     vulnerabilities.push(sprintf);
     const vsprintf = {
-        pattern: /\bvsprintf\(*.+?\)\b/g,
+        pattern: /\bvsprintf\(*.+?\)/g,
         errorMsg: 'vsprintf() is vulnerable to buffer overflow attacks. Consider using snprintf().',
         active: settings.c.vsprintf
     };

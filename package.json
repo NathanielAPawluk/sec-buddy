@@ -3,6 +3,8 @@
 	"description": "Real time security verification for programmers",
 	"version": "0.1.1",
 	"author": "Nathaniel Pawluk",
+	"icon": "./src/icon.png",
+	"publisher": "sec-buddy",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/NathanielAPawluk/sec-buddy"
